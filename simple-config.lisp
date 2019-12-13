@@ -79,5 +79,9 @@ replaces all underscores with hyphens"
 	 (blankp value))
      nil)
 
+    ;; if value is like :value then we interpret that as a keyword
+    ((starts-with-p ":" value)
+     (string-to-keyword (subseq value 1 (length value))))
+
     ;; if we're here then we just return the straight value
     (t value)))
