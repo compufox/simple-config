@@ -27,25 +27,27 @@ returns T on success, NIL otherwise"
   (if parse-lists
       (unless list-separator
 	(error "list-separator must be provided if parse-lists is non-nil")))
-  
-  (with-open-file (conf file-path)
-    (setf *config*
-	  (loop
-	     for line = (read-line conf nil)
-	       
-	     while line
-	       
-	     ;; allows for inline comments
-	     unless (or (starts-with-p "#" line) (blankp line))
-	     do (setf line (subseq line 0 (or (search "#" line :test #'string=)
-					      (length line))))
-	       
-	     unless (or (starts-with-p "#" line) (blankp line))
-	     collect (let ((input (mapcar #'trim (split #\= line)))
-			   (*parse-lists* parse-lists)
-			   (*list-separator* list-separator))
-		       (cons
-			(intern (replace-all "_" "-" (string-upcase (car input)))
+  (let ((*parse-lists* parse-lists)
+	(*list-separator* list-separator))
+    (with-open-file (conf file-path)
+      (setf *config*
+	    (loop
+	       for line = (read-line conf nil)
+	       with input
+		 
+	       while line
+		 
+	       ;; allows for inline comments
+	       unless (or (starts-with-p "#" line) (blankp line))
+	       do (setf line (subseq line 0 (or (search "#" line :test #'string=)
+						(length line))))
+
+	       do (setf input (mapcar #'trim (split #\= line)))
+		 
+	       unless (or (starts-with-p "#" line) (blankp line))
+	       collect (cons
+			(intern (replace-all "_" "-"
+					     (string-upcase (car input)))
 				:keyword)
 			(parse-value (trim (cadr input))))))))
   (when *config*
