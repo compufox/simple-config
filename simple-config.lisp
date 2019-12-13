@@ -5,8 +5,8 @@
 (defvar *config* nil
   "our loaded config")
 
-(defvar *parse-lists* t)
-(defvar *list-separator* #\,)
+(defvar *parse-lists*)
+(defvar *list-separator*)
 
 (defun config (key &optional default)
   "retrieve the value from config using KEY, returns nil if not found
@@ -15,7 +15,7 @@ if DEFAULT is given returns it instead of nil when KEY is not found"
   (or (cdr (assoc key *config* :test #'equal))
       default))
 
-(defun load-config (file-path &key (parse-lists *parse-lists*) (list-separator *list-separator*))
+(defun load-config (file-path &key (parse-lists t) (list-separator #\,))
   "loads config at FILE-PATH
 
 PARSE-LISTS defaults to t
@@ -27,32 +27,42 @@ returns T on success, NIL otherwise"
   (if parse-lists
       (unless list-separator
 	(error "list-separator must be provided if parse-lists is non-nil")))
-  (let ((*parse-lists* parse-lists)
-	(*list-separator* list-separator))
-    (with-open-file (conf file-path)
+  
+  (with-safe-io-syntax ()
+
+    ;; shadow our defaults 
+    (let ((*parse-lists* parse-lists)
+	  (*list-separator* list-separator)
+
+	  ;; go ahead and remove blank lines and commented out lines
+	  (file-contents (remove-if (lambda (l)
+				      (starts-with-p "#" l))
+				    (remove-if #'blankp (read-file-lines file-path)))))
+      
       (setf *config*
 	    (loop
-	       for line = (read-line conf nil)
+	       for line in file-contents
 	       with input
 		 
-	       while line
-		 
 	       ;; allows for inline comments
-	       unless (or (starts-with-p "#" line) (blankp line))
 	       do (setf line (subseq line 0 (or (search "#" line :test #'string=)
 						(length line))))
 
 	       do (setf input (mapcar #'trim (split #\= line)))
 		 
-	       unless (or (starts-with-p "#" line) (blankp line))
 	       collect (cons
-			(intern (replace-all "_" "-"
-					     (string-upcase (car input)))
-				:keyword)
+			(string-to-keyword (car input))
 			(parse-value (trim (cadr input))))))))
   (when *config*
     t))
-  
+
+(defun string-to-keyword (str)
+  "converts STR into a keyword
+
+replaces all underscores with hyphens"
+  (intern (replace-all "_" "-" (string-upcase str))
+	  :keyword))
+
 (defun parse-value (value)
   "determines what kind of data VALUE is, and parses it correctly"
   (cond

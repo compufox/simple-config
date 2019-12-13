@@ -3,6 +3,9 @@
 (defpackage #:simple-config
   (:use #:cl)
   (:nicknames #:conf)
+  (:import-from #:uiop
+		:with-safe-io-syntax
+		:read-file-lines)
   (:import-from #:str
 		:trim
 		:digitp

@@ -6,7 +6,7 @@
   :license  "BSD 3-Clause"
   :version "1.0"
   :serial t
-  :depends-on (#:str)
+  :depends-on (#:str #:uiop)
   :components ((:file "package")
                (:file "simple-config"))
   :in-order-to ((test-op (test-op "simple-config-test"))))
