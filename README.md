@@ -20,8 +20,10 @@ Loads a config file from FILE-PATH
 
 if PARSE-LISTS is non-nil VALUES are checked for LIST-SEPARATOR and split by it.
 
+
 PARSE-LISTS defaults to t
-LIST-SEPARATOR defaults to #\,
+
+LIST-SEPARATOR defaults to #\\,
 
 Returns t if successfully loaded, otherwise nil
 
