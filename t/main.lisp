@@ -1,6 +1,6 @@
 (in-package :simple-config-test)
 
-(plan 7)
+(plan 9)
 
 (load-config (merge-pathnames "t/example.config"
 			      (asdf:system-source-directory :simple-config-test)))
@@ -13,5 +13,11 @@
 (is (config :also-false) nil)
 (is (config :test-key) "thisIsASecretKey")
 (is (config :keyword) :test)
+
+(load-config (merge-pathnames "t/example.config"
+			      (asdf:system-source-directory :simple-config-test))
+	     :list-separator #\Space)
+
+(is (config :prime-list) '(1 2 3 5))
 
 (finalize)
