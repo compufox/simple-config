@@ -12,6 +12,10 @@ program-version=2
 aws_bucket = config-bucket
 ```
 
+## Install
+
+`(ql:quickload :simple-config)`
+
 ## API
 
 `load-config` - file-path **&key** parse-lists list-separator
