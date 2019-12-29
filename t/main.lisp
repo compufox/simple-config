@@ -10,6 +10,7 @@
 (is (config :number-list) '(1 2 3 4))
 (is (config :mixed-list) '(1 "b" 3 "d"))
 (is (config :false-value) nil)
+(is (config :also-false) nil)
 (is (config :test-key) "thisIsASecretKey")
 (is (config :keyword) :test)
 

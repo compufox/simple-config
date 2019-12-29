@@ -75,7 +75,7 @@ replaces all underscores with hyphens"
      (mapcar #'parse-value (mapcar #'trim (split *list-separator* value))))
 
     ;; if false or blankp, we return nil
-    ((or (string= "false" value)
+    ((or (string= "false" (string-downcase value))
 	 (blankp value))
      nil)
 
