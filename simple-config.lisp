@@ -35,8 +35,7 @@ returns T on success, NIL otherwise"
 	  (*list-separator* list-separator)
 
 	  ;; go ahead and remove blank lines and commented out lines
-	  (file-contents (remove-if (lambda (l)
-				      (starts-with-p "#" l))
+	  (file-contents (remove-if #'line-comment-p
 				    (remove-if #'blankp (read-file-lines file-path)))))
       
       (setf *config*
@@ -85,3 +84,7 @@ replaces all underscores with hyphens"
 
     ;; if we're here then we just return the straight value
     (t value)))
+
+(defun line-comment-p (line)
+  "checks if LINE is a full line comments"
+  (starts-with-p "#" line))
