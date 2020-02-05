@@ -55,6 +55,28 @@ returns T on success, NIL otherwise"
   (when *config*
     t))
 
+(defmethod (setf config) (value key)
+  "allows us to do setf on (config) calls"
+  (setf *config* (remove key *config* :key #'car))
+  (push (cons key value) *config*))
+
+(defun save-config (filepath)
+  "saves currently loaded config to FILEPATH"
+  (with-open-file (out filepath :direction :output
+				:if-exists :overwrite)
+    (format out "~{~/conf::print-config/~%~}" *config*)))
+
+(defun print-config (stream data &optional colonp atsignp)
+  "custom format function that prints out config"
+  (declare (ignore colonp atsignp))
+  (destructuring-bind (key . val) data
+    (format stream 
+	    (typecase val
+	      (list "~a = ~{~a~^, ~}")
+	      (t "~a = ~a"))
+	    (string-downcase (symbol-name key))
+	    val)))
+
 (defun string-to-keyword (str)
   "converts STR into a keyword
 

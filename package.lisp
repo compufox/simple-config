@@ -15,4 +15,5 @@
 		:containsp
 		:starts-with-p)
   (:export :config
-	   :load-config))
+	   :load-config
+	   :save-config))
