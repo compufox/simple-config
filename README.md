@@ -41,6 +41,13 @@ If DEFAULT is given, returns it instead of nil if KEY isn't found
 
 --- 
 
+`save-config` - file-path
+
+writes the currently loaded config to FILE-PATH,
+overwriting it if it already exists
+
+---
+
 ## License
 
 BSD 3-Clause

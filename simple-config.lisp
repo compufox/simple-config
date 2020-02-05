@@ -60,7 +60,7 @@ returns T on success, NIL otherwise"
   (setf *config* (remove key *config* :key #'car))
   (push (cons key value) *config*))
 
-(defun save-config (filepath)
+(defun save-config (file-path)
   "saves currently loaded config to FILEPATH"
   (with-open-file (out filepath :direction :output
 				:if-exists :overwrite)
