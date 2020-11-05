@@ -29,21 +29,21 @@ PARSE-LISTS defaults to t
 
 LIST-SEPARATOR defaults to #\\,
 
-Returns t if successfully loaded, otherwise nil
+Returns the loaded config
 
 ---
 
-`config` - key **&optional** default
+`config` - config key **&optional** default
 
-Checks loaded config for KEY, returning nil if not found
+Checks CONFIG for KEY, returning nil if not found
 
 If DEFAULT is given, returns it instead of nil if KEY isn't found
 
 --- 
 
-`save-config` - file-path
+`save-config` - config file-path
 
-writes the currently loaded config to FILE-PATH,
+writes the CONFIG to FILE-PATH,
 overwriting it if it already exists
 
 ---

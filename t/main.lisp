@@ -2,22 +2,26 @@
 
 (plan 9)
 
-(load-config (merge-pathnames "t/example.config"
-			      (asdf:system-source-directory :simple-config-test)))
+(defvar *config*
+  (load-config (merge-pathnames "t/example.config"
+                                (asdf:system-source-directory :simple-config-test))))
 
-(is (config :number) 4)
-(is (config :list) '("a" "b" "c" "d"))
-(is (config :number-list) '(1 2 3 4))
-(is (config :mixed-list) '(1 "b" 3 "d"))
-(is (config :false-value) nil)
-(is (config :also-false) nil)
-(is (config :test-key) "thisIsASecretKey")
-(is (config :keyword) :test)
+(defvar *space-sep*
+  (load-config (merge-pathnames "t/example.config"
+                                (asdf:system-source-directory :simple-config-test))
+               :list-separator #\Space))
 
-(load-config (merge-pathnames "t/example.config"
-			      (asdf:system-source-directory :simple-config-test))
-	     :list-separator #\Space)
+(is (config *config* :number) 4)
+(is (config *config* :list) '("a" "b" "c" "d"))
+(is (config *config* :number-list) '(1 2 3 4))
+(is (config *config* :mixed-list) '(1 "b" 3 "d"))
+(is (config *config* :false-value) nil)
+(is (config *config* :also-false) nil)
+(is (config *config* :test-key) "thisIsASecretKey")
+(is (config *config* :keyword) :test)
 
-(is (config :prime-list) '(1 2 3 5))
+
+
+(is (config *space-sep* :prime-list) '(1 2 3 5))
 
 (finalize)
