@@ -62,7 +62,7 @@ returns T on success, NIL otherwise"
 
 (defun save-config (file-path)
   "saves currently loaded config to FILEPATH"
-  (with-open-file (out filepath :direction :output
+  (with-open-file (out file-path :direction :output
 				:if-exists :overwrite)
     (format out "~{~/conf::print-config/~%~}" *config*)))
 
