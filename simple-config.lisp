@@ -47,7 +47,7 @@ returns T on success, NIL otherwise"
 	       do (setf line (subseq line 0 (or (search "#" line :test #'string=)
 						(length line))))
 
-	       do (setf input (mapcar #'trim (split #\= line)))
+	       do (setf input (mapcar #'trim (split #\= line :limit 2)))
 		 
 	       collect (cons
 			(string-to-keyword (car input))
