@@ -8,14 +8,16 @@
 (defvar *parse-lists*)
 (defvar *list-separator*)
 
-(defun config (key &optional default)
+(defun config (key &optional default config)
   "retrieve the value from config using KEY, returns nil if not found
 
-if DEFAULT is given returns it instead of nil when KEY is not found"
-  (or (cdr (assoc key *config* :test #'equal))
+if DEFAULT is given returns it instead of nil when KEY is not found
+
+if CONFIG is passed in, we use that instead of our internal *CONFIG* variable"
+  (or (cdr (assoc key (or config *config*) :test #'equal))
       default))
 
-(defun load-config (file-path &key (parse-lists t) (list-separator #\,))
+(defun load-config (file-path &key (parse-lists t) (list-separator #\,) (set-internal-var t))
   "loads config at FILE-PATH
 
 PARSE-LISTS defaults to t
@@ -23,7 +25,9 @@ LIST-SEPARATOR defaults to #\,
 
 if PARSE-LISTS is non-nil we check any value for character LIST-SEPARATOR and split it by that
 
-returns T on success, NIL otherwise"
+if SET-INTERNAL-VAR is non-nil we set SIMPLE-CONFIG::*CONFIG* to the alist we get from parsing the specified file
+
+returns T on success, NIL otherwise, or an alist if SET-INTERNAL-VAR is nil"
   (if parse-lists
       (unless list-separator
 	(error "list-separator must be provided if parse-lists is non-nil")))
@@ -31,29 +35,32 @@ returns T on success, NIL otherwise"
   (with-safe-io-syntax ()
 
     ;; shadow our defaults 
-    (let ((*parse-lists* parse-lists)
-	  (*list-separator* list-separator)
+    (let* ((*parse-lists* parse-lists)
+	   (*list-separator* list-separator)
 
-	  ;; go ahead and remove blank lines and commented out lines
-	  (file-contents (remove-if #'line-comment-p
-				    (remove-if #'blankp (read-file-lines file-path)))))
-      
-      (setf *config*
-	    (loop
-	       for line in file-contents
-	       with input
+	   ;; go ahead and remove blank lines and commented out lines
+	   (file-contents (remove-if #'line-comment-p
+				     (remove-if #'blankp (read-file-lines file-path))))
+           (parsed-config (loop
+	                   for line in file-contents
+	                   with input
 		 
-	       ;; allows for inline comments
-	       do (setf line (subseq line 0 (or (search "#" line :test #'string=)
-						(length line))))
+	                   ;; allows for inline comments
+	                   do (setf line (subseq line 0 (or (search "#" line :test #'string=)
+						            (length line))))
 
-	       do (setf input (mapcar #'trim (split #\= line :limit 2)))
+	                   do (setf input (mapcar #'trim (split #\= line :limit 2)))
 		 
-	       collect (cons
-			(string-to-keyword (car input))
-			(parse-value (trim (cadr input))))))))
-  (when *config*
-    t))
+	                   collect (cons
+			            (string-to-keyword (car input))
+			            (parse-value (trim (cadr input)))))))
+      (when set-internal-var
+        (setf *config* parsed-config))
+
+      (cond
+        ((and set-internal-var *config*) t)
+        ((not set-internal-var) parsed-config)
+        (t nil)))))
 
 (defmethod (setf config) (value key)
   "allows us to do setf on (config) calls"
